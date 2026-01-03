@@ -12,6 +12,7 @@ from goodreads_tools.http_client import DEFAULT_BASE_URL, GoodreadsClient
 from goodreads_tools.models import ReadingTimelineEntry
 
 _DATE_FORMATS = ("%b %d, %Y", "%B %d, %Y", "%b %Y", "%B %Y", "%Y")
+_SUMMARY_LABELS = {"description", "summary", "book description"}
 
 
 def _parse_human_date(value: str | None) -> str | None:
@@ -40,6 +41,48 @@ def _extract_pages(text: str | None) -> int | None:
         return None
     match = re.search(r"(\d+)", text)
     return int(match.group(1)) if match else None
+
+
+def _clean_text(value: str | None) -> str | None:
+    if not value:
+        return None
+    cleaned = " ".join(value.split())
+    if not cleaned:
+        return None
+    if cleaned.lower() in _SUMMARY_LABELS:
+        return None
+    return cleaned
+
+
+def _extract_author(row: Node) -> str | None:
+    node = row.css_first("td.field.author a")
+    if node is None:
+        node = row.css_first("td.field.author .value")
+    if node is None:
+        node = row.css_first("td.field.author")
+    return _clean_text(node.text(strip=True) if node else None)
+
+
+def _extract_summary(row: Node) -> str | None:
+    selectors = [
+        "td.field.book_description .value",
+        "td.field.book_description",
+        "td.field.description .value",
+        "td.field.description",
+        "td.field.summary .value",
+        "td.field.summary",
+    ]
+    for selector in selectors:
+        node = row.css_first(selector)
+        if node is None:
+            continue
+        value_node = node.css_first("div.value") or node.css_first("span.value")
+        if value_node is not None:
+            node = value_node
+        text = _clean_text(node.text(strip=True) if node else None)
+        if text:
+            return text
+    return None
 
 
 def _extract_session_id(classes: str, prefix: str) -> str | None:
@@ -80,6 +123,8 @@ def parse_review_list_html(html: str, shelf: str | None = None) -> list[ReadingT
         book_id = _extract_book_id(title_node.attributes.get("href") if title_node else None)
         pages_node = row.css_first("td.field.num_pages")
         pages = _extract_pages(pages_node.text(strip=True) if pages_node else None)
+        author = _extract_author(row)
+        summary = _extract_summary(row)
 
         started_node = row.css_first("td.field.date_started")
         read_node = row.css_first("td.field.date_read")
@@ -108,6 +153,8 @@ def parse_review_list_html(html: str, shelf: str | None = None) -> list[ReadingT
                 ReadingTimelineEntry(
                     title=title,
                     book_id=book_id,
+                    author=author,
+                    summary=summary,
                     pages=pages,
                     started_at=None,
                     finished_at=None,
@@ -121,6 +168,8 @@ def parse_review_list_html(html: str, shelf: str | None = None) -> list[ReadingT
                 ReadingTimelineEntry(
                     title=title,
                     book_id=book_id,
+                    author=author,
+                    summary=summary,
                     pages=pages,
                     started_at=started_sessions.get(session_id),
                     finished_at=read_sessions.get(session_id),

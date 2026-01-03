@@ -53,6 +53,8 @@ def build_reading_timeline(
             ReadingTimelineEntry(
                 title=item.title,
                 book_id=item.book_id,
+                author=item.author,
+                summary=item.description,
                 pages=pages,
                 started_at=_to_iso(_pick_start_date(item, start_source)),
                 finished_at=_to_iso(item.read_at),
