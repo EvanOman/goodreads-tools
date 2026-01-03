@@ -47,3 +47,4 @@ jobs:
 
       - name: Publish
         uses: pypa/gh-action-pypi-publish@release/v1
+        continue-on-error: true
