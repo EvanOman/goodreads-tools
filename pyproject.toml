@@ -1,10 +1,26 @@
 [project]
 name = "goodreads-cli"
 version = "0.0.1"
-description = "Add your description here"
+description = "Unofficial Goodreads CLI for exporting reading timelines and pages/day charts."
 readme = "README.md"
 authors = [
-    { name = "Evan Oman" }
+    { name = "Evan Oman", email = "evan058@gmail.com" }
+]
+license = { file = "LICENSE" }
+keywords = ["books", "cli", "dashboard", "goodreads", "reading", "rss", "scraping"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet",
+    "Topic :: Utilities",
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -16,6 +32,11 @@ dependencies = [
     "selectolax>=0.4.6",
     "typer>=0.21.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/EvanOman/goodreads_cli"
+Repository = "https://github.com/EvanOman/goodreads_cli"
+Issues = "https://github.com/EvanOman/goodreads_cli/issues"
 
 [project.scripts]
 goodreads-cli = "goodreads_cli:main"
