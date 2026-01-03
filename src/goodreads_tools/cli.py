@@ -236,6 +236,16 @@ def shelf_list(
     console.print(table)
 
 
+@public_shelf_app.command("count")
+def shelf_count(
+    user: str = typer.Option(..., "--user"),
+    shelf: str = typer.Option("all", "--shelf"),
+) -> None:
+    """Count shelf items using the public RSS feed."""
+    items = get_shelf_items(user, shelf)
+    typer.echo(str(len(items)))
+
+
 @public_shelf_app.command("export")
 def shelf_export(
     user: str = typer.Option(..., "--user"),

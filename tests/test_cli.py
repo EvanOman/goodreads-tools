@@ -78,6 +78,27 @@ def test_cli_shelf_export_csv(monkeypatch) -> None:
     assert "title,author,book_id,link" in result.stdout
 
 
+def test_cli_shelf_count(monkeypatch) -> None:
+    def fake_shelf_items(_: str, __: str) -> list[ShelfItem]:
+        return [
+            ShelfItem(
+                title="Shelf Book 1",
+                link="https://www.goodreads.com/book/show/1",
+                book_id="1",
+            ),
+            ShelfItem(
+                title="Shelf Book 2",
+                link="https://www.goodreads.com/book/show/2",
+                book_id="2",
+            ),
+        ]
+
+    monkeypatch.setattr("goodreads_tools.cli.get_shelf_items", fake_shelf_items)
+    result = runner.invoke(app, ["public", "shelf", "count", "--user", "1", "--shelf", "read"])
+    assert result.exit_code == 0
+    assert result.stdout.strip() == "2"
+
+
 def test_cli_shelf_timeline_jsonl(monkeypatch) -> None:
     def fake_timeline(_: str, __: str, **___) -> list[ReadingTimelineEntry]:
         return [
