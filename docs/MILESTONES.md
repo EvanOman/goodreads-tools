@@ -46,7 +46,7 @@ Deliverables:
 
 ### Milestone 4: Auth + write flows
 
-Status: in progress (auth scaffolding + whoami + csrf helper complete; write flows pending).
+Status: not started (future). Auth helpers exist; write flows are deferred.
 
 Deliverables:
 
@@ -57,7 +57,7 @@ Deliverables:
 
 ### Milestone 5: Reading timeline export (dashboard data)
 
-Status: in progress.
+Status: complete (timeline + chart + tests).
 
 Deliverables:
 
