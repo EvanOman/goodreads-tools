@@ -54,6 +54,7 @@ class ShelfItem(BaseModel):
     link: str
     book_id: str
     author: str | None = None
+    description: str | None = None
     average_rating: float | None = None
     rating: int | None = None
     read_at: str | None = None
@@ -71,6 +72,8 @@ class ShelfItem(BaseModel):
 class ReadingTimelineEntry(BaseModel):
     title: str
     book_id: str
+    author: str | None = None
+    summary: str | None = None
     pages: int | None = None
     started_at: str | None = None
     finished_at: str | None = None

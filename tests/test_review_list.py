@@ -12,6 +12,8 @@ def test_parse_review_list_html_sessions() -> None:
     first, second = entries
     assert first.title == "Test Book"
     assert first.book_id == "123"
+    assert first.author == "Test Author"
+    assert first.summary == "Test summary."
     assert first.pages == 300
     assert first.started_at == "2024-01-02"
     assert first.finished_at == "2024-01-10"

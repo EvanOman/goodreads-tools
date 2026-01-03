@@ -56,6 +56,7 @@ def parse_shelf_rss(xml_text: str) -> list[ShelfItem]:
                 link=_text(item.find("link")) or "",
                 book_id=_text(item.find("book_id")) or "",
                 author=_text(item.find("author_name")),
+                description=_text(item.find("book_description")),
                 average_rating=_float(_text(item.find("average_rating"))),
                 rating=_int(_text(item.find("user_rating"))),
                 read_at=_text(item.find("user_read_at")),
