@@ -97,3 +97,25 @@ def test_cli_shelf_timeline_jsonl(monkeypatch) -> None:
     payload = json.loads(_strip_ansi(result.stdout))
     assert payload["title"] == "Timeline Book"
     assert payload["pages"] == 321
+
+
+def test_cli_shelf_chart(monkeypatch) -> None:
+    def fake_timeline(_: str, __: str, **___) -> list[ReadingTimelineEntry]:
+        return [
+            ReadingTimelineEntry(
+                title="Chart Book",
+                book_id="99",
+                pages=300,
+                started_at="2024-01-01T00:00:00+00:00",
+                finished_at="2024-01-03T00:00:00+00:00",
+            )
+        ]
+
+    def fake_chart(*_: object, **__: object) -> str:
+        return "CHART"
+
+    monkeypatch.setattr("goodreads_cli.cli.get_reading_timeline", fake_timeline)
+    monkeypatch.setattr("goodreads_cli.cli.render_pages_per_day_chart", fake_chart)
+    result = runner.invoke(app, ["public", "shelf", "chart", "--user", "1"])
+    assert result.exit_code == 0
+    assert "CHART" in result.stdout

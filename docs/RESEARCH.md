@@ -55,6 +55,14 @@
 
 - Commercial scrapers (Apify’s Goodreads Book Search actor, MCP marketplace tools) already sell shelf/search data, which confirms that the HTML/RSS approach works at scale and that the site doesn’t aggressively block bots when requests are throttled.
 
+## CLI visualization options
+
+- [`plotext`](https://github.com/piccolomo/plotext) renders bar and line charts directly in the terminal, returns rendered strings via `build()`, and is pure Python.
+- [`termplotlib`](https://github.com/nschloe/termplotlib) is small and MIT-licensed, but focuses on scatter/line plots and uses `numpy` for some features.
+- `rich` can be used to build custom bar-like tables, but it requires more manual layout for axes and labels.
+
+Decision: use `plotext` for a minimal dependency that can render bar charts with labels in a single call, while keeping the math and binning logic in our own modules for test coverage.
+
 ## Risks and unknowns
 
 - Write operations (adding/removing books, editing reviews) require authenticated requests whose exact endpoints still need to be discovered. Plan: capture requests from the web app or mobile app using browser devtools/mitmproxy, then replicate the minimal set (probably `POST /shelf/add_to_shelf`, `POST /review/edit`, etc.).

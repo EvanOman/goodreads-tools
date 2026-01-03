@@ -63,5 +63,6 @@ Deliverables:
 
 - `goodreads-cli public shelf timeline --user <id> --shelf all` exports JSONL rows with title, start/end dates, and page counts.
 - Timeline entries prefer RSS `num_pages`; optionally resolve missing pages via book pages.
+- `goodreads-cli public shelf chart --user <id> --from <YYYY-MM-DD> --to <YYYY-MM-DD>` renders a pages/day bar chart.
 - Unit tests for RSS page parsing + timeline JSONL output.
 - Live test against a public shelf to confirm pages and dates populate.
