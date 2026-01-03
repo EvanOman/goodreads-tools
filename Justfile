@@ -21,6 +21,8 @@ test:
 test-live:
     GOODREADS_LIVE=1 uv run pytest -m live
 
-check-all: lint format-check type test
+fc: fmt lint-fix lint type test
 
-ci: check-all
+check-all: fc
+
+ci: lint format-check type test
