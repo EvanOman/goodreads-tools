@@ -26,14 +26,5 @@ jobs:
       - name: Sync dependencies
         run: uv sync --dev
 
-      - name: Lint
-        run: uv run ruff check .
-
-      - name: Format
-        run: uv run ruff format --check .
-
-      - name: Type check
-        run: uv run ty check .
-
-      - name: Tests
-        run: uv run pytest
+      - name: Check
+        run: just ci
