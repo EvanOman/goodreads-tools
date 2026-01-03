@@ -269,7 +269,12 @@ def shelf_timeline(
     ),
     resolve_pages: bool = typer.Option(False, "--resolve-pages/--no-resolve-pages"),
     max_pages: int | None = typer.Option(None, "--max-pages"),
-    concurrency: int = typer.Option(1, "--concurrency", min=1),
+    concurrency: int = typer.Option(
+        4,
+        "--concurrency",
+        min=1,
+        help="HTML only; set 1 to disable concurrency.",
+    ),
     output: Path | None = typer.Option(None, "--output", "-o"),
 ) -> None:
     """Export reading timeline entries for a shelf as JSONL or JSON."""
@@ -329,7 +334,12 @@ def shelf_chart(
     ),
     resolve_pages: bool = typer.Option(False, "--resolve-pages/--no-resolve-pages"),
     max_pages: int | None = typer.Option(None, "--max-pages"),
-    concurrency: int = typer.Option(1, "--concurrency", min=1),
+    concurrency: int = typer.Option(
+        4,
+        "--concurrency",
+        min=1,
+        help="HTML only; set 1 to disable concurrency.",
+    ),
     width: int = typer.Option(100, "--width"),
     height: int = typer.Option(20, "--height"),
 ) -> None:

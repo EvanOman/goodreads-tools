@@ -185,7 +185,7 @@ def get_review_list_timeline(
     client: GoodreadsClient | None = None,
     *,
     max_pages: int | None = None,
-    concurrency: int = 1,
+    concurrency: int = 4,
 ) -> list[ReadingTimelineEntry]:
     close_client = False
     if client is None:

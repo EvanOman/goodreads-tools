@@ -104,7 +104,7 @@ def get_reading_timeline(
     start_source: StartDateSource = "auto",
     resolve_pages: bool = False,
     max_pages: int | None = None,
-    html_concurrency: int = 1,
+    html_concurrency: int = 4,
 ) -> list[ReadingTimelineEntry]:
     close_client = False
     if client is None:
