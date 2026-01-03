@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+from html import unescape
 from urllib.parse import urljoin
 
 from selectolax.parser import HTMLParser, Node
@@ -141,12 +143,49 @@ def _find_next_page(html: str) -> str | None:
     return href
 
 
+def _extract_total_pages(html: str) -> int | None:
+    parser = HTMLParser(html)
+    max_page: int | None = None
+    for link in parser.css("div#reviewPagination a[href]"):
+        href = unescape(link.attributes.get("href") or "")
+        match = re.search(r"(?:^|[?&])page=(\d+)", href)
+        if not match:
+            continue
+        page = int(match.group(1))
+        if max_page is None or page > max_page:
+            max_page = page
+    return max_page
+
+
+def _fetch_review_list_page(
+    user_id: str,
+    shelf: str,
+    page: int,
+    *,
+    client: GoodreadsClient | None = None,
+) -> list[ReadingTimelineEntry]:
+    close_client = False
+    if client is None:
+        client = GoodreadsClient()
+        close_client = True
+    try:
+        html = client.get_text(
+            f"/review/list/{user_id}",
+            params={"shelf": shelf, "sort": "date_read", "order": "d", "page": page},
+        )
+        return parse_review_list_html(html, shelf=shelf)
+    finally:
+        if close_client:
+            client.close()
+
+
 def get_review_list_timeline(
     user_id: str,
     shelf: str,
     client: GoodreadsClient | None = None,
     *,
     max_pages: int | None = None,
+    concurrency: int = 4,
 ) -> list[ReadingTimelineEntry]:
     close_client = False
     if client is None:
@@ -159,17 +198,51 @@ def get_review_list_timeline(
         params = {"shelf": shelf, "sort": "date_read", "order": "d"}
         page_count = 0
 
-        while True:
-            html = client.get_text(page_url, params=params)
-            entries.extend(parse_review_list_html(html, shelf=shelf))
-            page_count += 1
-            if max_pages is not None and page_count >= max_pages:
-                break
-            next_href = _find_next_page(html)
-            if not next_href:
-                break
-            page_url = urljoin(DEFAULT_BASE_URL, next_href)
-            params = None
+        html = client.get_text(page_url, params=params)
+        entries.extend(parse_review_list_html(html, shelf=shelf))
+        page_count += 1
+        if max_pages is not None and page_count >= max_pages:
+            return entries
+
+        total_pages = _extract_total_pages(html)
+        if total_pages is None or concurrency <= 1:
+            while True:
+                next_href = _find_next_page(html)
+                if not next_href:
+                    break
+                page_url = urljoin(DEFAULT_BASE_URL, next_href)
+                params = None
+                html = client.get_text(page_url, params=params)
+                entries.extend(parse_review_list_html(html, shelf=shelf))
+                page_count += 1
+                if max_pages is not None and page_count >= max_pages:
+                    break
+            return entries
+
+        if max_pages is not None:
+            total_pages = min(total_pages, max_pages)
+        if total_pages <= 1:
+            return entries
+
+        page_numbers = list(range(2, total_pages + 1))
+        max_workers = min(max(1, concurrency), len(page_numbers))
+        if max_workers <= 1:
+            for page in page_numbers:
+                entries.extend(_fetch_review_list_page(user_id, shelf, page, client=client))
+            return entries
+
+        results: list[tuple[int, list[ReadingTimelineEntry]]] = []
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
+                executor.submit(_fetch_review_list_page, user_id, shelf, page): page
+                for page in page_numbers
+            }
+            for future in as_completed(futures):
+                page = futures[future]
+                results.append((page, future.result()))
+
+        for _, page_entries in sorted(results, key=lambda item: item[0]):
+            entries.extend(page_entries)
         return entries
     finally:
         if close_client:

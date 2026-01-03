@@ -26,14 +26,19 @@ jobs:
       - name: Sync dependencies
         run: uv sync --dev
 
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
       - name: Lint
-        run: uv run ruff check .
+        run: just lint
 
       - name: Format
-        run: uv run ruff format --check .
+        run: just format-check
 
       - name: Type check
-        run: uv run ty check .
+        run: just type
 
       - name: Tests
-        run: uv run pytest
+        run: just test

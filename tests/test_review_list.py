@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from goodreads_tools.public.review_list import parse_review_list_html
+from goodreads_tools.public.review_list import _extract_total_pages, parse_review_list_html
 
 
 def test_parse_review_list_html_sessions() -> None:
@@ -19,3 +19,14 @@ def test_parse_review_list_html_sessions() -> None:
 
     assert second.started_at == "2025-08-01"
     assert second.finished_at == "2024-02-14"
+
+
+def test_extract_total_pages() -> None:
+    html = (
+        '<div id="reviewPagination">'
+        '<a href="/review/list/1?order=d&amp;page=2&amp;shelf=read&amp;sort=date_read">2</a>'
+        '<a href="/review/list/1?order=d&amp;page=12&amp;shelf=read&amp;sort=date_read">12</a>'
+        '<a class="next_page" href="/review/list/1?order=d&amp;page=2&amp;shelf=read&amp;sort=date_read">next</a>'
+        "</div>"
+    )
+    assert _extract_total_pages(html) == 12

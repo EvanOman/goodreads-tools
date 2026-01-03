@@ -42,6 +42,9 @@ uv run goodreads-tools public search "Dune" -n 5
 # export a reading timeline as JSONL
 uv run goodreads-tools public shelf timeline --user <user-id> --shelf read --source html --format jsonl
 
+# HTML scraping is concurrent by default; use --concurrency 1 to opt out
+uv run goodreads-tools public shelf timeline --user <user-id> --shelf read --source html --format jsonl --concurrency 1
+
 # render a pages/day chart for a date range
 uv run goodreads-tools public shelf chart --user <user-id> --shelf read --source html --from 2023-01-01 --to 2025-12-30 --bin-days 14
 ```

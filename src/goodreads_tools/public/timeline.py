@@ -104,6 +104,7 @@ def get_reading_timeline(
     start_source: StartDateSource = "auto",
     resolve_pages: bool = False,
     max_pages: int | None = None,
+    html_concurrency: int = 4,
 ) -> list[ReadingTimelineEntry]:
     close_client = False
     if client is None:
@@ -116,6 +117,7 @@ def get_reading_timeline(
                 shelf,
                 client=client,
                 max_pages=max_pages,
+                concurrency=html_concurrency,
             )
             return _resolve_entry_pages(entries, client) if resolve_pages else entries
         items = list(get_shelf_items(user_id, shelf, client=client))
