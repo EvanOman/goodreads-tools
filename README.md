@@ -73,4 +73,8 @@ just type
 just test
 ```
 
+### Releases
+
+See `docs/RELEASE.md` for the release-please flow and conventional commit guidance.
+
 The project targets Python 3.13 (via `.python-version`). Use `uv` for dependency management and execution.
