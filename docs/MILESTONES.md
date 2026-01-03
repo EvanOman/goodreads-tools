@@ -54,3 +54,14 @@ Deliverables:
 - Write commands (shelve/rate/review) based on captured POST flows.
 - Unit tests for auth/session loading + mocked POST handling.
 - Live test for a safe write (opt-in and user-confirmed).
+
+### Milestone 5: Reading timeline export (dashboard data)
+
+Status: in progress.
+
+Deliverables:
+
+- `goodreads-cli public shelf timeline --user <id> --shelf all` exports JSONL rows with title, start/end dates, and page counts.
+- Timeline entries prefer RSS `num_pages`; optionally resolve missing pages via book pages.
+- Unit tests for RSS page parsing + timeline JSONL output.
+- Live test against a public shelf to confirm pages and dates populate.

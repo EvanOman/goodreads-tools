@@ -75,4 +75,5 @@ Milestones with testable deliverables are tracked in `docs/MILESTONES.md`.
 - Milestone 2 complete: book show command, HTML parser for `__NEXT_DATA__`, and unit/live tests.
 - Milestone 3 complete: shelf RSS parsing, list/export commands, and unit/live tests.
 - Milestone 4 in progress: login/whoami auth scaffolding + CSRF extraction complete; write flows pending.
+- Milestone 5 in progress: reading timeline export for dashboard data (pages + start/end dates).
 - Write-flow capture instructions live in `docs/flow-write.md`.

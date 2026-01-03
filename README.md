@@ -22,6 +22,9 @@ uv run goodreads-cli public shelf list --user 1 --shelf all -n 5
 
 # export a shelf
 uv run goodreads-cli public shelf export --user 1 --shelf all --format json
+
+# export a reading timeline as JSONL
+uv run goodreads-cli public shelf timeline --user 1 --shelf all --format jsonl
 ```
 
 ### Current status
@@ -57,6 +60,9 @@ uv run goodreads-cli public shelf list --user 1 --shelf all -n 5
 
 # export a shelf to JSON or CSV
 uv run goodreads-cli public shelf export --user 1 --shelf all --format json
+
+# export reading timeline rows for dashboards
+uv run goodreads-cli public shelf timeline --user 1 --shelf all --format jsonl
 
 # store cookies from browser or manual cookie string
 uv run goodreads-cli auth login --browser chrome

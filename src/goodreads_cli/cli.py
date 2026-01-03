@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
 import typer
 from rich.console import Console
@@ -23,6 +24,12 @@ from goodreads_cli.public.shelf import (
     get_shelf_items,
     shelf_items_to_csv,
     shelf_items_to_json,
+)
+from goodreads_cli.public.timeline import (
+    StartDateSource,
+    get_reading_timeline,
+    timeline_entries_to_json,
+    timeline_entries_to_jsonl,
 )
 
 app = typer.Typer(help="Unofficial Goodreads CLI (see docs/PLAN.md).")
@@ -234,6 +241,45 @@ def shelf_export(
         raise typer.BadParameter("format must be 'json' or 'csv'")
 
     content = shelf_items_to_json(items) if fmt_lower == "json" else shelf_items_to_csv(items)
+    if output:
+        output.write_text(content, encoding="utf-8")
+        return
+    typer.echo(content)
+
+
+@public_shelf_app.command("timeline")
+def shelf_timeline(
+    user: str = typer.Option(..., "--user"),
+    shelf: str = typer.Option("all", "--shelf"),
+    fmt: str = typer.Option("jsonl", "--format", "-f"),
+    start_source: str = typer.Option(
+        "auto",
+        "--start-source",
+        help="auto|started|added|created",
+    ),
+    resolve_pages: bool = typer.Option(False, "--resolve-pages/--no-resolve-pages"),
+    output: Path | None = typer.Option(None, "--output", "-o"),
+) -> None:
+    """Export reading timeline entries for a shelf as JSONL or JSON."""
+    fmt_lower = fmt.lower()
+    if fmt_lower not in {"jsonl", "json"}:
+        raise typer.BadParameter("format must be 'jsonl' or 'json'")
+
+    start_source_value = start_source.lower()
+    if start_source_value not in {"auto", "started", "added", "created"}:
+        raise typer.BadParameter("start-source must be auto|started|added|created")
+
+    entries = get_reading_timeline(
+        user,
+        shelf,
+        start_source=cast(StartDateSource, start_source_value),
+        resolve_pages=resolve_pages,
+    )
+    content = (
+        timeline_entries_to_jsonl(entries)
+        if fmt_lower == "jsonl"
+        else timeline_entries_to_json(entries)
+    )
     if output:
         output.write_text(content, encoding="utf-8")
         return
