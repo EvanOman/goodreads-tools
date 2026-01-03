@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/EvanOman/goodreads-tools/compare/goodreads-tools-v1.1.3...goodreads-tools-v1.2.0) (2026-01-03)
+
+
+### Features
+
+* add shelf count command ([#22](https://github.com/EvanOman/goodreads-tools/issues/22)) ([af71c59](https://github.com/EvanOman/goodreads-tools/commit/af71c59427a1c22f02ce42fb598144ca249099ee))
+
 ## [1.1.3](https://github.com/EvanOman/goodreads-tools/compare/goodreads-tools-v1.1.2...goodreads-tools-v1.1.3) (2026-01-03)
 
 
