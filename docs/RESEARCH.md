@@ -25,6 +25,7 @@
 - Standard HTML pages embed machine-readable data:
   - `book/show/<slug-or-id>` pages ship a large `__NEXT_DATA__` JSON blob containing book metadata, aggregated stats, and featured reviews. This can be parsed instead of hand-writing selectors.
   - Shelf pages (`review/list/<user_id>`) include the shelf table in HTML and expose links for each row. Even when signed out we can parse book ids, shelves, ratings, etc.
+  - The shelf table HTML contains hidden `date_started` and `date_read` cells with one or more reading sessions (for rereads). These are rendered even when not signed in.
 
 - Shelf RSS payloads already include page counts and reading timestamps:
   - Each `<item>` includes `<book><num_pages>...</num_pages></book>`, which avoids extra book page requests for page counts.

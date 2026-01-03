@@ -35,6 +35,7 @@ from goodreads_cli.public.shelf import (
 )
 from goodreads_cli.public.timeline import (
     StartDateSource,
+    TimelineSource,
     get_reading_timeline,
     timeline_entries_to_json,
     timeline_entries_to_jsonl,
@@ -260,18 +261,24 @@ def shelf_timeline(
     user: str = typer.Option(..., "--user"),
     shelf: str = typer.Option("all", "--shelf"),
     fmt: str = typer.Option("jsonl", "--format", "-f"),
+    source: str = typer.Option("rss", "--source", help="rss|html"),
     start_source: str = typer.Option(
         "auto",
         "--start-source",
         help="auto|started|added|created",
     ),
     resolve_pages: bool = typer.Option(False, "--resolve-pages/--no-resolve-pages"),
+    max_pages: int | None = typer.Option(None, "--max-pages"),
     output: Path | None = typer.Option(None, "--output", "-o"),
 ) -> None:
     """Export reading timeline entries for a shelf as JSONL or JSON."""
     fmt_lower = fmt.lower()
     if fmt_lower not in {"jsonl", "json"}:
         raise typer.BadParameter("format must be 'jsonl' or 'json'")
+
+    source_value = source.lower()
+    if source_value not in {"rss", "html"}:
+        raise typer.BadParameter("source must be 'rss' or 'html'")
 
     start_source_value = start_source.lower()
     if start_source_value not in {"auto", "started", "added", "created"}:
@@ -280,8 +287,10 @@ def shelf_timeline(
     entries = get_reading_timeline(
         user,
         shelf,
+        source=cast(TimelineSource, source_value),
         start_source=cast(StartDateSource, start_source_value),
         resolve_pages=resolve_pages,
+        max_pages=max_pages,
     )
     content = (
         timeline_entries_to_jsonl(entries)
@@ -310,16 +319,22 @@ def shelf_chart(
     start_date: str | None = typer.Option(None, "--from", "--start-date"),
     end_date: str | None = typer.Option(None, "--to", "--end-date"),
     bin_days: int = typer.Option(1, "--bin-days", min=1),
+    source: str = typer.Option("rss", "--source", help="rss|html"),
     start_source: str = typer.Option(
         "auto",
         "--start-source",
         help="auto|started|added|created",
     ),
     resolve_pages: bool = typer.Option(False, "--resolve-pages/--no-resolve-pages"),
+    max_pages: int | None = typer.Option(None, "--max-pages"),
     width: int = typer.Option(100, "--width"),
     height: int = typer.Option(20, "--height"),
 ) -> None:
     """Render a pages/day bar chart for a shelf over a date range."""
+    source_value = source.lower()
+    if source_value not in {"rss", "html"}:
+        raise typer.BadParameter("source must be 'rss' or 'html'")
+
     start_source_value = start_source.lower()
     if start_source_value not in {"auto", "started", "added", "created"}:
         raise typer.BadParameter("start-source must be auto|started|added|created")
@@ -327,8 +342,10 @@ def shelf_chart(
     entries = get_reading_timeline(
         user,
         shelf,
+        source=cast(TimelineSource, source_value),
         start_source=cast(StartDateSource, start_source_value),
         resolve_pages=resolve_pages,
+        max_pages=max_pages,
     )
     if not entries:
         typer.echo("No timeline entries found.", err=True)
