@@ -1,46 +1,50 @@
 ## Goodreads CLI (unofficial)
 
-This project aims to provide a modern, scriptable Goodreads command-line client powered by `uv` and Python. The official Goodreads API is no longer issuing keys, so the tool relies on scraping publicly available endpoints plus authenticated requests made with the user’s existing browser session.
+A fast, scriptable CLI that turns your Goodreads shelves into dashboard-ready data. It exports clean JSONL for your reading timeline (including rereads), estimates pages per day, and renders a text-based bar chart you can use in a terminal or CI logs.
 
-### Overview
+### What it does
 
-- Read-only: search titles, fetch book details, list/export public shelves via RSS.
-- Auth helpers: store cookies, `whoami`, and CSRF extraction checks for upcoming write flows.
-- Built for automation: JSON/CSV output and `uvx`-friendly execution.
+- Export your reading timeline with start/end dates and page counts.
+- Generate pages-per-day charts from that timeline (even with overlapping reads).
+- Pull book metadata and public shelf data without needing API keys.
+- Keep everything scriptable with JSON/CSV output.
 
-### Usage summary
+### How it works
+
+- Public data comes from Goodreads RSS feeds and book pages.
+- For read-start/end dates, the CLI scrapes the public review list HTML (the `read` shelf exposes those fields).
+- Page counts come from RSS when available and fall back to book pages if needed.
+- Auth helpers exist for future write operations, but are not required for read-only features.
+
+### Sample: last 10 finished books (read shelf)
+
+| Title | Started | Finished | Pages | Book ID |
+| --- | --- | --- | --- | --- |
+| A Christmas Carol | 2025-12-22 | 2025-12-30 | 184 | 5326 |
+| A Philosophy of Software Design | 2025-08-01 | 2025-12-30 | 184 | 58665335 |
+| The Wright Brothers | 2025-10-13 | 2025-10-14 | 320 | 22609391 |
+| The Secret of Our Success: How Culture Is Driving Human Evolution, Domesticating Our Species, and Making Us Smarter | 2025-09-15 | 2025-10-10 | 456 | 25761655 |
+| Kill It with Fire: Manage Aging Computer Systems | 2025-09-27 | 2025-10-07 | 248 | 54716655 |
+| The Almanack of Naval Ravikant: A Guide to Wealth and Happiness | 2025-09-25 | 2025-10-05 | 244 | 54898389 |
+| The Thinking Machine: Jensen Huang, Nvidia, and the World's Most Coveted Microchip | 2025-09-05 | 2025-09-12 | 272 | 211399783 |
+| Influence: The Psychology of Persuasion | 2025-07-30 | 2025-09-06 | 320 | 28815 |
+| Think Again: The Power of Knowing What You Don't Know | 2025-06-12 | 2025-07-22 | 307 | 55539565 |
+| Getting Naked: A Business Fable about Shedding the Three Fears That Sabotage Client Loyalty | 2025-07-01 | 2025-07-07 | 240 | 7717531 |
+
+More sample outputs live in `samples/README.md`.
+
+### Quick start
 
 ```bash
 # search titles
 uv run goodreads-cli public search "Dune" -n 5
 
-# fetch book details
-uv run goodreads-cli public book show 44767458
-
-# list a public shelf
-uv run goodreads-cli public shelf list --user 1 --shelf all -n 5
-
-# export a shelf
-uv run goodreads-cli public shelf export --user 1 --shelf all --format json
-
 # export a reading timeline as JSONL
-uv run goodreads-cli public shelf timeline --user 1 --shelf all --format jsonl
-
-# export a reading timeline using HTML list (includes start/read dates)
-uv run goodreads-cli public shelf timeline --user 1 --shelf read --source html --format jsonl
+uv run goodreads-cli public shelf timeline --user <user-id> --shelf read --source html --format jsonl
 
 # render a pages/day chart for a date range
-uv run goodreads-cli public shelf chart --user 1 --from 2025-01-01 --to 2025-02-01 --bin-days 7
+uv run goodreads-cli public shelf chart --user <user-id> --shelf read --source html --from 2023-01-01 --to 2025-12-30 --bin-days 14
 ```
-
-Sample outputs live in `samples/README.md`.
-
-### Current status
-
-- Research on available endpoints, scraping strategies, and prior art lives in [`docs/RESEARCH.md`](docs/RESEARCH.md).
-- The implementation roadmap (phased plan, architecture, and near-term tasks) is tracked in [`docs/PLAN.md`](docs/PLAN.md).
-- Milestones and testable deliverables are listed in [`docs/MILESTONES.md`](docs/MILESTONES.md).
-- A `typer`-based CLI and supporting modules will live under `src/goodreads_cli/`.
 
 ### Development
 
@@ -48,7 +52,7 @@ Sample outputs live in `samples/README.md`.
 # create / activate the project environment
 uv sync
 
-# run the dev CLI (placeholder command for now)
+# run the dev CLI
 uv run goodreads-cli
 
 # run via uvx (local)
@@ -57,56 +61,16 @@ uvx --from . goodreads-cli --help
 # run via uvx (git)
 uvx --from git+https://github.com/EvanOman/goodreads_cli goodreads-cli --help
 
-# search titles
-uv run goodreads-cli public search "Dune" -n 5
-
-# fetch a book by id or url
-uv run goodreads-cli public book show 44767458
-
-# list a public shelf via RSS
-uv run goodreads-cli public shelf list --user 1 --shelf all -n 5
-
-# export a shelf to JSON or CSV
-uv run goodreads-cli public shelf export --user 1 --shelf all --format json
-
-# export reading timeline rows for dashboards
-uv run goodreads-cli public shelf timeline --user 1 --shelf all --format jsonl
-
-# export timeline entries with reread sessions (HTML list)
-uv run goodreads-cli public shelf timeline --user 1 --shelf read --source html --format jsonl
-
-# render a pages/day chart (bins optional)
-uv run goodreads-cli public shelf chart --user 1 --from 2025-01-01 --to 2025-02-01 --bin-days 7
-
-# store cookies from browser or manual cookie string
-uv run goodreads-cli auth login --browser chrome
-uv run goodreads-cli auth login --cookie-string "_session_id2=...; ccsid=...; locale=en"
-
-# show the current authenticated user
-uv run goodreads-cli auth whoami
-
-# validate session + csrf extraction
-uv run goodreads-cli auth check
-
 # run unit tests
 uv run pytest
 
 # run live tests (network)
 GOODREADS_LIVE=1 uv run pytest -m live
 
-# run live auth test (requires a valid cookie string)
-GOODREADS_LIVE=1 GOODREADS_COOKIE="_session_id2=...; ccsid=...; locale=en" uv run pytest -m live -k whoami
-
-# run live csrf test (requires the same cookie string)
-GOODREADS_LIVE=1 GOODREADS_COOKIE="_session_id2=...; ccsid=...; locale=en" uv run pytest -m live -k csrf
-
 # justfile helpers (lint/type/test)
 just lint
 just type
 just test
-
-# pre-commit hook (runs just check-all)
-uv run pre-commit run --all-files
 ```
 
 The project targets Python 3.13 (via `.python-version`). Use `uv` for dependency management and execution.
