@@ -269,6 +269,7 @@ def shelf_timeline(
     ),
     resolve_pages: bool = typer.Option(False, "--resolve-pages/--no-resolve-pages"),
     max_pages: int | None = typer.Option(None, "--max-pages"),
+    concurrency: int = typer.Option(1, "--concurrency", min=1),
     output: Path | None = typer.Option(None, "--output", "-o"),
 ) -> None:
     """Export reading timeline entries for a shelf as JSONL or JSON."""
@@ -291,6 +292,7 @@ def shelf_timeline(
         start_source=cast(StartDateSource, start_source_value),
         resolve_pages=resolve_pages,
         max_pages=max_pages,
+        html_concurrency=concurrency,
     )
     content = (
         timeline_entries_to_jsonl(entries)
@@ -327,6 +329,7 @@ def shelf_chart(
     ),
     resolve_pages: bool = typer.Option(False, "--resolve-pages/--no-resolve-pages"),
     max_pages: int | None = typer.Option(None, "--max-pages"),
+    concurrency: int = typer.Option(1, "--concurrency", min=1),
     width: int = typer.Option(100, "--width"),
     height: int = typer.Option(20, "--height"),
 ) -> None:
@@ -346,6 +349,7 @@ def shelf_chart(
         start_source=cast(StartDateSource, start_source_value),
         resolve_pages=resolve_pages,
         max_pages=max_pages,
+        html_concurrency=concurrency,
     )
     if not entries:
         typer.echo("No timeline entries found.", err=True)
