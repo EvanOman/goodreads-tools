@@ -33,6 +33,8 @@ uv run goodreads-cli public shelf timeline --user 1 --shelf read --source html -
 uv run goodreads-cli public shelf chart --user 1 --from 2025-01-01 --to 2025-02-01 --bin-days 7
 ```
 
+Sample outputs live in `samples/README.md`.
+
 ### Current status
 
 - Research on available endpoints, scraping strategies, and prior art lives in [`docs/RESEARCH.md`](docs/RESEARCH.md).
