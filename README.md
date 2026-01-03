@@ -73,4 +73,11 @@ just type
 just test
 ```
 
+### Releases
+
+Releases use release-please with conventional-commit PR titles. It maintains a single
+release PR on `master`; when you merge that PR, it creates the tag and GitHub Release.
+The PyPI publish job runs on the GitHub Release (best-effort until OIDC is configured).
+See `docs/RELEASE.md` for the full flow and examples.
+
 The project targets Python 3.13 (via `.python-version`). Use `uv` for dependency management and execution.
