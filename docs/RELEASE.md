@@ -32,4 +32,4 @@ Rules of thumb:
 2) Release-please opens or updates the release PR.
 3) When ready, merge the release PR (squash merge is fine).
 4) Release-please creates the tag and GitHub Release automatically.
-5) The PyPI publish job runs inside the release-please workflow when a release is created.
+5) Release-please dispatches the Publish to PyPI workflow when a release is created.
