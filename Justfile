@@ -3,6 +3,9 @@ set shell := ["zsh", "-cu"]
 fmt:
     uv run ruff format .
 
+format-check:
+    uv run ruff format --check .
+
 lint:
     uv run ruff check .
 
@@ -18,4 +21,6 @@ test:
 test-live:
     GOODREADS_LIVE=1 uv run pytest -m live
 
-ci: lint type test
+check-all: lint format-check type test
+
+ci: check-all

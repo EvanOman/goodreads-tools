@@ -5,8 +5,8 @@ from typing import Any
 
 from selectolax.parser import HTMLParser
 
-from .http_client import GoodreadsClient
-from .models import BookDetails
+from goodreads_cli.http_client import GoodreadsClient
+from goodreads_cli.models import BookDetails
 
 
 def _extract_next_data(html: str) -> dict[str, Any]:
@@ -24,7 +24,9 @@ def _find_book_record(apollo_state: dict[str, Any]) -> dict[str, Any]:
     raise ValueError("No Book record found in apollo state.")
 
 
-def _resolve_author(apollo_state: dict[str, Any], book: dict[str, Any]) -> tuple[int | None, str | None]:
+def _resolve_author(
+    apollo_state: dict[str, Any], book: dict[str, Any]
+) -> tuple[int | None, str | None]:
     primary = book.get("primaryContributorEdge") or {}
     node = primary.get("node") or {}
     ref = node.get("__ref")
@@ -34,7 +36,9 @@ def _resolve_author(apollo_state: dict[str, Any], book: dict[str, Any]) -> tuple
     return author.get("legacyId"), author.get("name")
 
 
-def _resolve_stats(apollo_state: dict[str, Any], book: dict[str, Any]) -> tuple[float | None, int | None]:
+def _resolve_stats(
+    apollo_state: dict[str, Any], book: dict[str, Any]
+) -> tuple[float | None, int | None]:
     work = book.get("work") or {}
     ref = work.get("__ref")
     if not ref or ref not in apollo_state:
@@ -47,7 +51,7 @@ def _resolve_stats(apollo_state: dict[str, Any], book: dict[str, Any]) -> tuple[
 
 
 def _pick_description(book: dict[str, Any]) -> str | None:
-    for key in ("description({\"stripped\":true})", "description"):
+    for key in ('description({"stripped":true})', "description"):
         value = book.get(key)
         if isinstance(value, str) and value.strip():
             return value.strip()

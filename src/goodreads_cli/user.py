@@ -4,8 +4,8 @@ import json
 import re
 from typing import Any
 
-from .http_client import GoodreadsClient
-from .models import UserInfo
+from goodreads_cli.http_client import GoodreadsClient
+from goodreads_cli.models import UserInfo
 
 _CURRENT_USER_RE = re.compile(
     r"CurrentUserStore\.initializeWith\((\{.*?\})\);",
@@ -27,11 +27,7 @@ def parse_current_user(html: str) -> UserInfo | None:
 def _build_user_info(current: dict[str, Any]) -> UserInfo:
     user_id = current.get("id") or current.get("legacyId") or current.get("userId")
     name = current.get("name") or current.get("displayName")
-    profile_url = (
-        current.get("profileUrl")
-        or current.get("link")
-        or current.get("webUrl")
-    )
+    profile_url = current.get("profileUrl") or current.get("link") or current.get("webUrl")
     return UserInfo(
         user_id=str(user_id) if user_id is not None else "",
         name=name or "",

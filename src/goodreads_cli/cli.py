@@ -7,19 +7,19 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from .auth import (
+from goodreads_cli.auth import (
     SESSION_PATH,
     create_session_from_browser,
     create_session_from_cookie_string,
     load_session,
     save_session,
 )
-from .book import get_book_details
-from .csrf import fetch_csrf_token
-from .http_client import GoodreadsClient
-from .search import search_books
-from .shelf import get_shelf_items, shelf_items_to_csv, shelf_items_to_json
-from .user import get_current_user
+from goodreads_cli.book import get_book_details
+from goodreads_cli.csrf import fetch_csrf_token
+from goodreads_cli.http_client import GoodreadsClient
+from goodreads_cli.search import search_books
+from goodreads_cli.shelf import get_shelf_items, shelf_items_to_csv, shelf_items_to_json
+from goodreads_cli.user import get_current_user
 
 app = typer.Typer(help="Unofficial Goodreads CLI (see docs/PLAN.md).")
 book_app = typer.Typer(help="Book commands.")
@@ -44,6 +44,7 @@ def root(ctx: typer.Context) -> None:
     if ctx.invoked_subcommand is None:
         _print_docs_message()
 
+
 app.add_typer(book_app, name="book")
 app.add_typer(shelf_app, name="shelf")
 app.add_typer(auth_app, name="auth")
@@ -61,9 +62,7 @@ def search(
         items = items[:limit]
 
     if json_output:
-        console.print_json(
-            json.dumps([item.model_dump(by_alias=True) for item in items])
-        )
+        console.print_json(json.dumps([item.model_dump(by_alias=True) for item in items]))
         return
 
     table = Table(title=f'Results for "{query}"')
@@ -174,7 +173,10 @@ def book_show(
     table.add_row("Language", details.language or "")
     table.add_row("URL", details.url)
     if details.description:
-        table.add_row("Description", details.description[:300] + ("..." if len(details.description) > 300 else ""))
+        table.add_row(
+            "Description",
+            details.description[:300] + ("..." if len(details.description) > 300 else ""),
+        )
     console.print(table)
 
 

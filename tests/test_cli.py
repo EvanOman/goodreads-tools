@@ -70,6 +70,8 @@ def test_cli_shelf_export_csv(monkeypatch) -> None:
         ]
 
     monkeypatch.setattr("goodreads_cli.cli.get_shelf_items", fake_shelf_items)
-    result = runner.invoke(app, ["shelf", "export", "--user", "1", "--shelf", "all", "--format", "csv"])
+    result = runner.invoke(
+        app, ["shelf", "export", "--user", "1", "--shelf", "all", "--format", "csv"]
+    )
     assert result.exit_code == 0
     assert "title,author,book_id,link" in result.stdout

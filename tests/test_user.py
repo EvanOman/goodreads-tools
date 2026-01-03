@@ -3,7 +3,7 @@ from goodreads_cli.user import parse_current_user
 
 def test_parse_current_user() -> None:
     html = (
-        '<script>ReactStores.CurrentUserStore.initializeWith('
+        "<script>ReactStores.CurrentUserStore.initializeWith("
         '{"currentUser":{"id":123,"name":"Example User","profileUrl":"https://www.goodreads.com/user/show/123"}});'
         "</script>"
     )

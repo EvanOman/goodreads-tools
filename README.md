@@ -2,6 +2,28 @@
 
 This project aims to provide a modern, scriptable Goodreads command-line client powered by `uv` and Python. The official Goodreads API is no longer issuing keys, so the tool relies on scraping publicly available endpoints plus authenticated requests made with the user’s existing browser session.
 
+### Overview
+
+- Read-only: search titles, fetch book details, list/export public shelves via RSS.
+- Auth helpers: store cookies, `whoami`, and CSRF extraction checks for upcoming write flows.
+- Built for automation: JSON/CSV output and `uvx`-friendly execution.
+
+### Usage summary
+
+```bash
+# search titles
+uv run goodreads-cli search "Dune" -n 5
+
+# fetch book details
+uv run goodreads-cli book show 44767458
+
+# list a public shelf
+uv run goodreads-cli shelf list --user 1 --shelf all -n 5
+
+# export a shelf
+uv run goodreads-cli shelf export --user 1 --shelf all --format json
+```
+
 ### Current status
 
 - Research on available endpoints, scraping strategies, and prior art lives in [`docs/RESEARCH.md`](docs/RESEARCH.md).
@@ -17,6 +39,12 @@ uv sync
 
 # run the dev CLI (placeholder command for now)
 uv run goodreads-cli
+
+# run via uvx (local)
+uvx --from . goodreads-cli --help
+
+# run via uvx (git)
+uvx --from git+https://github.com/EvanOman/goodreads_cli goodreads-cli --help
 
 # search titles
 uv run goodreads-cli search "Dune" -n 5
@@ -56,6 +84,9 @@ GOODREADS_LIVE=1 GOODREADS_COOKIE="_session_id2=...; ccsid=...; locale=en" uv ru
 just lint
 just type
 just test
+
+# pre-commit hook (runs just check-all)
+uv run pre-commit run --all-files
 ```
 
 The project targets Python 3.13 (via `.python-version`). Use `uv` for dependency management and execution.

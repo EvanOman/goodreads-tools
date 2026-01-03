@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-all
+        name: just check-all
+        entry: just check-all
+        language: system
+        pass_filenames: false
