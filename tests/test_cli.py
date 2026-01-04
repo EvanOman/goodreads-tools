@@ -78,6 +78,50 @@ def test_cli_shelf_export_csv(monkeypatch) -> None:
     assert "title,author,book_id,link" in result.stdout
 
 
+def test_cli_shelf_report_markdown(monkeypatch, tmp_path) -> None:
+    def fake_shelf_items(_: str, shelf: str) -> list[ShelfItem]:
+        if shelf == "read":
+            return [
+                ShelfItem(
+                    title="Read Book",
+                    link="https://www.goodreads.com/book/show/1",
+                    book_id="1",
+                    author="A Writer",
+                    rating=4,
+                    read_at="Mon, 01 Jan 2024 00:00:00 -0700",
+                )
+            ]
+        return [
+            ShelfItem(
+                title="Current Book",
+                link="https://www.goodreads.com/book/show/2",
+                book_id="2",
+                author="Another Writer",
+                date_started="Tue, 02 Jan 2024 00:00:00 -0700",
+            )
+        ]
+
+    output_path = tmp_path / "report.md"
+    monkeypatch.setattr("goodreads_tools.cli.get_shelf_items", fake_shelf_items)
+    result = runner.invoke(
+        app,
+        [
+            "public",
+            "shelf",
+            "report",
+            "--user",
+            "1",
+            "--output",
+            str(output_path),
+        ],
+    )
+    assert result.exit_code == 0
+    content = output_path.read_text(encoding="utf-8")
+    assert "# Goodreads Reading Report" in content
+    assert "## Currently Reading" in content
+    assert "## Read" in content
+
+
 def test_cli_shelf_count(monkeypatch) -> None:
     def fake_shelf_items(_: str, __: str) -> list[ShelfItem]:
         return [
