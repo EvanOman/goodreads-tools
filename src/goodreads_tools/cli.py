@@ -21,6 +21,7 @@ from goodreads_tools.auth.user import get_current_user
 from goodreads_tools.http_client import GoodreadsClient
 from goodreads_tools.public.book import get_book_details
 from goodreads_tools.public.reading_chart import render_pages_per_day_chart
+from goodreads_tools.public.reading_report import build_reading_report
 from goodreads_tools.public.reading_stats import (
     bin_daily_pages,
     clip_daily_pages,
@@ -264,6 +265,27 @@ def shelf_export(
         output.write_text(content, encoding="utf-8")
         return
     typer.echo(content)
+
+
+@public_shelf_app.command("report")
+def shelf_report(
+    user: str = typer.Option(..., "--user"),
+    output: Path = typer.Option(..., "--output", "-o"),
+    read_shelf: str = typer.Option("read", "--read-shelf"),
+    reading_shelf: str = typer.Option("currently-reading", "--reading-shelf"),
+) -> None:
+    """Write a markdown report for read and currently-reading shelves."""
+    read_items = get_shelf_items(user, read_shelf)
+    reading_items = get_shelf_items(user, reading_shelf)
+    content = build_reading_report(
+        user,
+        read_items,
+        reading_items,
+        read_shelf=read_shelf,
+        reading_shelf=reading_shelf,
+    )
+    output.write_text(content, encoding="utf-8")
+    typer.echo(f"Wrote report to {output}")
 
 
 @public_shelf_app.command("timeline")
